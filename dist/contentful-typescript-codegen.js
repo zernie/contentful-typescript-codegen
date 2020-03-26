@@ -232,7 +232,7 @@ function renderDefaultLocale(locales) {
     if (!defaultLocale) {
         throw new Error("Could not find a default locale in Contentful.");
     }
-    return "type CONTENTFUL_DEFAULT_LOCALE_CODE = '" + defaultLocale.code + "';";
+    return "export type CONTENTFUL_DEFAULT_LOCALE_CODE = '" + defaultLocale.code + "';";
 }
 
 function render(contentTypes, locales, namespace) {
@@ -244,15 +244,14 @@ function render(contentTypes, locales, namespace) {
                     sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
                     sortedLocales = locales.sort(function (a, b) { return a.code.localeCompare(b.code); });
                     source = [
+                        namespace && "declare namespace " + namespace + " {",
                         renderContentfulImports(),
                         renderAllContentTypes(sortedContentTypes),
                         renderAllContentTypeIds(sortedContentTypes),
                         renderAllLocales(sortedLocales),
                         renderDefaultLocale(sortedLocales),
-                    ].join("\n\n");
-                    if (namespace) {
-                        source = "declare namespace " + namespace + " {\n" + source + "\n}\nexport as namespace " + namespace + "\nexport=" + namespace;
-                    }
+                        namespace && "}\nexport as namespace " + namespace + "\nexport=" + namespace
+                    ].filter(Boolean).join("\n\n");
                     return [4 /*yield*/, prettier.resolveConfig(process.cwd())];
                 case 1:
                     prettierConfig = _a.sent();

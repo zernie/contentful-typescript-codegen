@@ -62,15 +62,14 @@ function render(contentTypes, locales, namespace) {
                     sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
                     sortedLocales = locales.sort(function (a, b) { return a.code.localeCompare(b.code); });
                     source = [
+                        namespace && "declare namespace " + namespace + " {",
                         renderContentfulImports_1.default(),
                         renderAllContentTypes(sortedContentTypes),
                         renderAllContentTypeIds(sortedContentTypes),
                         renderAllLocales_1.default(sortedLocales),
                         renderDefaultLocale_1.default(sortedLocales),
-                    ].join("\n\n");
-                    if (namespace) {
-                        source = "declare namespace " + namespace + " {\n" + source + "\n}\nexport as namespace " + namespace + "\nexport=" + namespace;
-                    }
+                        namespace && "}\nexport as namespace " + namespace + "\nexport=" + namespace
+                    ].filter(Boolean).join("\n\n");
                     return [4 /*yield*/, prettier_1.resolveConfig(process.cwd())];
                 case 1:
                     prettierConfig = _a.sent();
