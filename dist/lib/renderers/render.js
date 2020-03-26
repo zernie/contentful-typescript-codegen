@@ -53,7 +53,7 @@ var renderContentType_1 = require("./contentful/renderContentType");
 var renderUnion_1 = require("./typescript/renderUnion");
 var renderAllLocales_1 = require("./contentful/renderAllLocales");
 var renderDefaultLocale_1 = require("./contentful/renderDefaultLocale");
-function render(contentTypes, locales) {
+function render(contentTypes, locales, namespace) {
     return __awaiter(this, void 0, void 0, function () {
         var sortedContentTypes, sortedLocales, source, prettierConfig;
         return __generator(this, function (_a) {
@@ -68,6 +68,9 @@ function render(contentTypes, locales) {
                         renderAllLocales_1.default(sortedLocales),
                         renderDefaultLocale_1.default(sortedLocales),
                     ].join("\n\n");
+                    if (namespace) {
+                        source = "declare namespace " + namespace + " {\n" + source + "\n}\nexport as namespace " + namespace + "\nexport=" + namespace;
+                    }
                     return [4 /*yield*/, prettier_1.resolveConfig(process.cwd())];
                 case 1:
                     prettierConfig = _a.sent();
