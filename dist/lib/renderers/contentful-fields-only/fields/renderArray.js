@@ -18,7 +18,7 @@ function renderArray(field) {
     if (!field.items) {
         throw new Error("Cannot render non-array field " + field.id + " as an array");
     }
-    var fieldWithValidations = __assign(__assign({}, field), { linkType: field.items.linkType, validations: field.items.validations || [] });
+    var fieldWithValidations = __assign({}, field, { linkType: field.items.linkType, validations: field.items.validations || [] });
     switch (field.items.type) {
         case "Symbol": {
             return renderArrayOf_1.default(renderSymbol_1.default(fieldWithValidations));

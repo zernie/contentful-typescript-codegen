@@ -109,7 +109,7 @@ function renderContentTypeId(contentTypeId) {
 }
 
 function renderUnion(name, values) {
-    return "\n    export type " + name + " = " + renderUnionValues(values) + ";\n  ";
+    return "\n    type " + name + " = " + renderUnionValues(values) + ";\n  ";
 }
 function renderUnionValues(values) {
     if (values.length === 0) {
@@ -154,7 +154,7 @@ function renderArray(field) {
     if (!field.items) {
         throw new Error("Cannot render non-array field " + field.id + " as an array");
     }
-    var fieldWithValidations = __assign(__assign({}, field), { linkType: field.items.linkType, validations: field.items.validations || [] });
+    var fieldWithValidations = __assign({}, field, { linkType: field.items.linkType, validations: field.items.validations || [] });
     switch (field.items.type) {
         case "Symbol": {
             return renderArrayOf(renderSymbol(fieldWithValidations));
@@ -232,30 +232,28 @@ function renderDefaultLocale(locales) {
     if (!defaultLocale) {
         throw new Error("Could not find a default locale in Contentful.");
     }
-    return "export type CONTENTFUL_DEFAULT_LOCALE_CODE = '" + defaultLocale.code + "';";
+    return "type CONTENTFUL_DEFAULT_LOCALE_CODE = '" + defaultLocale.code + "';";
 }
 
 function render(contentTypes, locales, namespace) {
     return __awaiter(this, void 0, void 0, function () {
-        var sortedContentTypes, sortedLocales, source, prettierConfig;
+        var sortedContentTypes, sortedLocales, typings, source, prettierConfig;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
                     sortedLocales = locales.sort(function (a, b) { return a.code.localeCompare(b.code); });
-                    source = [
-                        namespace && "declare namespace " + namespace + " {",
-                        renderContentfulImports(),
+                    typings = [
                         renderAllContentTypes(sortedContentTypes),
                         renderAllContentTypeIds(sortedContentTypes),
                         renderAllLocales(sortedLocales),
                         renderDefaultLocale(sortedLocales),
-                        namespace && "}\nexport as namespace " + namespace + "\nexport=" + namespace
-                    ].filter(Boolean).join("\n\n");
+                    ].join("\n\n");
+                    source = [renderContentfulImports(), wrapInNamespace(typings, namespace)].join("\n\n");
                     return [4 /*yield*/, prettier.resolveConfig(process.cwd())];
                 case 1:
                     prettierConfig = _a.sent();
-                    return [2 /*return*/, prettier.format(source, __assign(__assign({}, prettierConfig), { parser: "typescript" }))];
+                    return [2 /*return*/, prettier.format(source, __assign({}, prettierConfig, { parser: "typescript" }))];
             }
         });
     });
@@ -265,6 +263,11 @@ function renderAllContentTypes(contentTypes) {
 }
 function renderAllContentTypeIds(contentTypes) {
     return renderUnion("CONTENT_TYPE", contentTypes.map(function (contentType) { return "'" + contentType.sys.id + "'"; }));
+}
+function wrapInNamespace(source, namespace) {
+    if (!namespace)
+        return source;
+    return "\n    declare namespace " + namespace + " {\n    " + source + "\n    }\n\n    export as namespace " + namespace + "\n    export=" + namespace + "\n  ";
 }
 
 function renderLink$1(field) {
@@ -287,7 +290,7 @@ function renderArray$1(field) {
     if (!field.items) {
         throw new Error("Cannot render non-array field " + field.id + " as an array");
     }
-    var fieldWithValidations = __assign(__assign({}, field), { linkType: field.items.linkType, validations: field.items.validations || [] });
+    var fieldWithValidations = __assign({}, field, { linkType: field.items.linkType, validations: field.items.validations || [] });
     switch (field.items.type) {
         case "Symbol": {
             return renderArrayOf(renderSymbol(fieldWithValidations));
@@ -348,7 +351,7 @@ function renderAllContentTypes$1(contentTypes) {
 }
 
 var meow = require("meow");
-var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <options>\n\n  Options\n    --output,      -o  Where to write to\n    --poll,        -p  Continuously refresh types\n    --interval N,  -i  The interval in seconds at which to poll (defaults to 15)\n    --namespace N, -n Wrap types in namespace (disabled by default)\n    --fields-only      Output a tree that _only_ ensures fields are valid\n                       and present, and does not provide types for Sys,\n                       Assets, or Rich Text. This is useful for ensuring raw\n                       Contentful responses will be compatible with your code.\n\n  Examples\n    $ contentful-typescript-codegen -o src/@types/generated/contentful.d.ts\n", {
+var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <options>\n\n  Options\n    --output,      -o  Where to write to\n    --poll,        -p  Continuously refresh types\n    --interval N,  -i  The interval in seconds at which to poll (defaults to 15)\n    --namespace N, -n  Wrap types in namespace N (disabled by default)\n    --fields-only      Output a tree that _only_ ensures fields are valid\n                       and present, and does not provide types for Sys,\n                       Assets, or Rich Text. This is useful for ensuring raw\n                       Contentful responses will be compatible with your code.\n\n  Examples\n    $ contentful-typescript-codegen -o src/@types/generated/contentful.d.ts\n", {
     flags: {
         output: {
             type: "string",
@@ -373,7 +376,7 @@ var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <
             type: "string",
             alias: "n",
             required: false,
-        }
+        },
     },
 });
 function runCodegen(outputFile) {

@@ -11,11 +11,10 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -55,25 +54,23 @@ var renderAllLocales_1 = require("./contentful/renderAllLocales");
 var renderDefaultLocale_1 = require("./contentful/renderDefaultLocale");
 function render(contentTypes, locales, namespace) {
     return __awaiter(this, void 0, void 0, function () {
-        var sortedContentTypes, sortedLocales, source, prettierConfig;
+        var sortedContentTypes, sortedLocales, typings, source, prettierConfig;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
                     sortedLocales = locales.sort(function (a, b) { return a.code.localeCompare(b.code); });
-                    source = [
-                        namespace && "declare namespace " + namespace + " {",
-                        renderContentfulImports_1.default(),
+                    typings = [
                         renderAllContentTypes(sortedContentTypes),
                         renderAllContentTypeIds(sortedContentTypes),
                         renderAllLocales_1.default(sortedLocales),
                         renderDefaultLocale_1.default(sortedLocales),
-                        namespace && "}\nexport as namespace " + namespace + "\nexport=" + namespace
-                    ].filter(Boolean).join("\n\n");
+                    ].join("\n\n");
+                    source = [renderContentfulImports_1.default(), wrapInNamespace(typings, namespace)].join("\n\n");
                     return [4 /*yield*/, prettier_1.resolveConfig(process.cwd())];
                 case 1:
                     prettierConfig = _a.sent();
-                    return [2 /*return*/, prettier_1.format(source, __assign(__assign({}, prettierConfig), { parser: "typescript" }))];
+                    return [2 /*return*/, prettier_1.format(source, __assign({}, prettierConfig, { parser: "typescript" }))];
             }
         });
     });
@@ -84,5 +81,10 @@ function renderAllContentTypes(contentTypes) {
 }
 function renderAllContentTypeIds(contentTypes) {
     return renderUnion_1.default("CONTENT_TYPE", contentTypes.map(function (contentType) { return "'" + contentType.sys.id + "'"; }));
+}
+function wrapInNamespace(source, namespace) {
+    if (!namespace)
+        return source;
+    return "\n    declare namespace " + namespace + " {\n    " + source + "\n    }\n\n    export as namespace " + namespace + "\n    export=" + namespace + "\n  ";
 }
 //# sourceMappingURL=render.js.map
