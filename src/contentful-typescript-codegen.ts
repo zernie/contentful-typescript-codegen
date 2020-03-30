@@ -71,7 +71,10 @@ async function runCodegen(outputFile: string) {
   if (cli.flags.fieldsOnly) {
     output = await renderFieldsOnly(contentTypes.items, { namespace: cli.flags.namespace })
   } else {
-    output = await render(contentTypes.items, locales.items, { namespace: cli.flags.namespace })
+    output = await render(contentTypes.items, locales.items, {
+      localization: cli.flags.localization,
+      namespace: cli.flags.namespace
+    })
   }
 
   outputFileSync(outputPath, output)
