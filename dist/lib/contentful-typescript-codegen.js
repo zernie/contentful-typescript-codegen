@@ -92,11 +92,14 @@ function runCodegen(outputFile) {
                     locales = _a.sent();
                     outputPath = path_1.default.resolve(process.cwd(), outputFile);
                     if (!cli.flags.fieldsOnly) return [3 /*break*/, 5];
-                    return [4 /*yield*/, renderFieldsOnly_1.default(contentTypes.items, cli.flags.namespace)];
+                    return [4 /*yield*/, renderFieldsOnly_1.default(contentTypes.items, { namespace: cli.flags.namespace })];
                 case 4:
                     output = _a.sent();
                     return [3 /*break*/, 7];
-                case 5: return [4 /*yield*/, render_1.default(contentTypes.items, locales.items, cli.flags.namespace)];
+                case 5: return [4 /*yield*/, render_1.default(contentTypes.items, locales.items, {
+                        localization: cli.flags.localization,
+                        namespace: cli.flags.namespace
+                    })];
                 case 6:
                     output = _a.sent();
                     _a.label = 7;

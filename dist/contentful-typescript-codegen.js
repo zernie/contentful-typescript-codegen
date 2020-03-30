@@ -102,7 +102,7 @@ function descriptionComment(description) {
 
 function renderField(field, type, localization) {
     if (localization === void 0) { localization = false; }
-    return renderInterfaceProperty(field.id, type, field.required, localization, field.name);
+    return renderInterfaceProperty(field.id, type, field.required, field.localized && localization, field.name);
 }
 
 function renderContentTypeId(contentTypeId) {
@@ -243,7 +243,7 @@ function renderNamespace(source, namespace) {
 }
 
 function render(contentTypes, locales, _a) {
-    var _b = _a === void 0 ? {} : _a, _c = _b.localization, localization = _c === void 0 ? false : _c, namespace = _b.namespace;
+    var _b = _a === void 0 ? {} : _a, namespace = _b.namespace, _c = _b.localization, localization = _c === void 0 ? false : _c;
     return __awaiter(this, void 0, void 0, function () {
         var sortedContentTypes, sortedLocales, typingsSource, source, prettierConfig;
         return __generator(this, function (_d) {
@@ -414,11 +414,14 @@ function runCodegen(outputFile) {
                     locales = _a.sent();
                     outputPath = path.resolve(process.cwd(), outputFile);
                     if (!cli.flags.fieldsOnly) return [3 /*break*/, 5];
-                    return [4 /*yield*/, renderFieldsOnly(contentTypes.items, cli.flags.namespace)];
+                    return [4 /*yield*/, renderFieldsOnly(contentTypes.items, { namespace: cli.flags.namespace })];
                 case 4:
                     output = _a.sent();
                     return [3 /*break*/, 7];
-                case 5: return [4 /*yield*/, render(contentTypes.items, locales.items, cli.flags.namespace)];
+                case 5: return [4 /*yield*/, render(contentTypes.items, locales.items, {
+                        localization: cli.flags.localization,
+                        namespace: cli.flags.namespace
+                    })];
                 case 6:
                     output = _a.sent();
                     _a.label = 7;

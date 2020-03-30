@@ -54,7 +54,7 @@ var renderAllLocales_1 = require("./contentful/renderAllLocales");
 var renderDefaultLocale_1 = require("./contentful/renderDefaultLocale");
 var renderNamespace_1 = require("./contentful/renderNamespace");
 function render(contentTypes, locales, _a) {
-    var _b = _a === void 0 ? {} : _a, _c = _b.localization, localization = _c === void 0 ? false : _c, namespace = _b.namespace;
+    var _b = _a === void 0 ? {} : _a, namespace = _b.namespace, _c = _b.localization, localization = _c === void 0 ? false : _c;
     return __awaiter(this, void 0, void 0, function () {
         var sortedContentTypes, sortedLocales, typingsSource, source, prettierConfig;
         return __generator(this, function (_d) {
