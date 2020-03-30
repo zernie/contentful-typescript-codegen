@@ -86,7 +86,7 @@ function renderInterfaceProperty(name, type, required, localization, description
         name,
         required ? "" : "?",
         ": ",
-        localization ? "Record<CONTENT_TYPE, " + type + ">" : type,
+        localization ? "Record<LOCALE_CODE, " + type + ">" : type,
         required ? "" : " | undefined",
         ";",
     ].join("");
