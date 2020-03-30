@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function renderInterfaceProperty(name, type, required, description) {
+function renderInterfaceProperty(name, type, required, localization, description) {
     return [
         descriptionComment(description),
         name,
         required ? "" : "?",
         ": ",
-        type,
+        localization ? "Record<CONTENT_TYPE, " + type + ">" : type,
         required ? "" : " | undefined",
         ";",
     ].join("");

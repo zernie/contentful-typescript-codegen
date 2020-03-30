@@ -11,9 +11,9 @@ var renderNumber_1 = require("./fields/renderNumber");
 var renderObject_1 = require("./fields/renderObject");
 var renderRichText_1 = require("./fields/renderRichText");
 var renderSymbol_1 = require("./fields/renderSymbol");
-function renderContentType(contentType) {
+function renderContentType(contentType, localization) {
     var name = renderContentTypeId_1.default(contentType.sys.id);
-    var fields = renderContentTypeFields(contentType.fields);
+    var fields = renderContentTypeFields(contentType.fields, localization);
     var sys = renderSys(contentType.sys);
     return "\n    " + renderInterface_1.default({ name: name + "Fields", fields: fields }) + "\n\n    " + descriptionComment(contentType.description) + "\n    " + renderInterface_1.default({ name: name, extension: "Entry<" + name + "Fields>", fields: sys }) + "\n  ";
 }
@@ -24,7 +24,7 @@ function descriptionComment(description) {
     }
     return "";
 }
-function renderContentTypeFields(fields) {
+function renderContentTypeFields(fields, localization) {
     return fields
         .filter(function (field) { return !field.omitted; })
         .map(function (field) {
@@ -41,7 +41,7 @@ function renderContentTypeFields(fields) {
             Symbol: renderSymbol_1.default,
             Text: renderSymbol_1.default,
         };
-        return renderField_1.default(field, functionMap[field.type](field));
+        return renderField_1.default(field, functionMap[field.type](field), localization);
     })
         .join("\n\n");
 }

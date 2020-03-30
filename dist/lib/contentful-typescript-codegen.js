@@ -40,7 +40,7 @@ var renderFieldsOnly_1 = require("./renderers/renderFieldsOnly");
 var path_1 = require("path");
 var fs_extra_1 = require("fs-extra");
 var meow = require("meow");
-var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <options>\n\n  Options\n    --output,      -o  Where to write to\n    --poll,        -p  Continuously refresh types\n    --interval N,  -i  The interval in seconds at which to poll (defaults to 15)\n    --namespace N, -n  Wrap types in namespace N (disabled by default)\n    --fields-only      Output a tree that _only_ ensures fields are valid\n                       and present, and does not provide types for Sys,\n                       Assets, or Rich Text. This is useful for ensuring raw\n                       Contentful responses will be compatible with your code.\n\n  Examples\n    $ contentful-typescript-codegen -o src/@types/generated/contentful.d.ts\n", {
+var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <options>\n\n  Options\n    --output,      -o  Where to write to\n    --poll,        -p  Continuously refresh types\n    --interval N,  -i  The interval in seconds at which to poll (defaults to 15)\n    --namespace N, -n  Wrap types in namespace N (disabled by default)\n    --fields-only      Output a tree that _only_ ensures fields are valid\n                       and present, and does not provide types for Sys,\n                       Assets, or Rich Text. This is useful for ensuring raw\n                       Contentful responses will be compatible with your code.\n    --localization -l  Output fields with localized values\n\n  Examples\n    $ contentful-typescript-codegen -o src/@types/generated/contentful.d.ts\n", {
     flags: {
         output: {
             type: "string",
@@ -59,6 +59,11 @@ var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <
         interval: {
             type: "string",
             alias: "i",
+            required: false,
+        },
+        localization: {
+            type: "boolean",
+            alias: "l",
             required: false,
         },
         namespace: {
@@ -87,7 +92,7 @@ function runCodegen(outputFile) {
                     locales = _a.sent();
                     outputPath = path_1.default.resolve(process.cwd(), outputFile);
                     if (!cli.flags.fieldsOnly) return [3 /*break*/, 5];
-                    return [4 /*yield*/, renderFieldsOnly_1.default(contentTypes.items)];
+                    return [4 /*yield*/, renderFieldsOnly_1.default(contentTypes.items, cli.flags.namespace)];
                 case 4:
                     output = _a.sent();
                     return [3 /*break*/, 7];

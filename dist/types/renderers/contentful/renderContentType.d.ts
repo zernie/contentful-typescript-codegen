@@ -1,2 +1,2 @@
 import { ContentType } from "contentful";
-export default function renderContentType(contentType: ContentType): string;
+export default function renderContentType(contentType: ContentType, localization: boolean): string;

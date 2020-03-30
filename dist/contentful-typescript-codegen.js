@@ -80,13 +80,13 @@ function renderInterface(_a) {
     return "\n    " + (description ? "/** " + description + " */" : "") + "\n    export interface " + name + " " + (extension ? "extends " + extension : "") + " {\n      " + fields + "\n    }\n  ";
 }
 
-function renderInterfaceProperty(name, type, required, description) {
+function renderInterfaceProperty(name, type, required, localization, description) {
     return [
         descriptionComment(description),
         name,
         required ? "" : "?",
         ": ",
-        type,
+        localization ? "Record<CONTENT_TYPE, " + type + ">" : type,
         required ? "" : " | undefined",
         ";",
     ].join("");
@@ -100,8 +100,9 @@ function descriptionComment(description) {
     }
 }
 
-function renderField(field, type) {
-    return renderInterfaceProperty(field.id, type, field.required, field.name);
+function renderField(field, type, localization) {
+    if (localization === void 0) { localization = false; }
+    return renderInterfaceProperty(field.id, type, field.required, localization, field.name);
 }
 
 function renderContentTypeId(contentTypeId) {
@@ -186,9 +187,9 @@ function renderRichText(field) {
     return "Document";
 }
 
-function renderContentType(contentType) {
+function renderContentType(contentType, localization) {
     var name = renderContentTypeId(contentType.sys.id);
-    var fields = renderContentTypeFields(contentType.fields);
+    var fields = renderContentTypeFields(contentType.fields, localization);
     var sys = renderSys(contentType.sys);
     return "\n    " + renderInterface({ name: name + "Fields", fields: fields }) + "\n\n    " + descriptionComment$1(contentType.description) + "\n    " + renderInterface({ name: name, extension: "Entry<" + name + "Fields>", fields: sys }) + "\n  ";
 }
@@ -198,7 +199,7 @@ function descriptionComment$1(description) {
     }
     return "";
 }
-function renderContentTypeFields(fields) {
+function renderContentTypeFields(fields, localization) {
     return fields
         .filter(function (field) { return !field.omitted; })
         .map(function (field) {
@@ -215,7 +216,7 @@ function renderContentTypeFields(fields) {
             Symbol: renderSymbol,
             Text: renderSymbol,
         };
-        return renderField(field, functionMap[field.type](field));
+        return renderField(field, functionMap[field.type](field), localization);
     })
         .join("\n\n");
 }
@@ -235,39 +236,41 @@ function renderDefaultLocale(locales) {
     return "type CONTENTFUL_DEFAULT_LOCALE_CODE = '" + defaultLocale.code + "';";
 }
 
-function render(contentTypes, locales, namespace) {
+function renderNamespace(source, namespace) {
+    if (!namespace)
+        return source;
+    return "\n    declare namespace " + namespace + " {\n    " + source + "\n    }\n\n    export as namespace " + namespace + "\n    export=" + namespace + "\n  ";
+}
+
+function render(contentTypes, locales, _a) {
+    var _b = _a === void 0 ? {} : _a, _c = _b.localization, localization = _c === void 0 ? false : _c, namespace = _b.namespace;
     return __awaiter(this, void 0, void 0, function () {
-        var sortedContentTypes, sortedLocales, typings, source, prettierConfig;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var sortedContentTypes, sortedLocales, typingsSource, source, prettierConfig;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
                     sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
                     sortedLocales = locales.sort(function (a, b) { return a.code.localeCompare(b.code); });
-                    typings = [
-                        renderAllContentTypes(sortedContentTypes),
+                    typingsSource = [
+                        renderAllContentTypes(sortedContentTypes, localization),
                         renderAllContentTypeIds(sortedContentTypes),
                         renderAllLocales(sortedLocales),
                         renderDefaultLocale(sortedLocales),
                     ].join("\n\n");
-                    source = [renderContentfulImports(), wrapInNamespace(typings, namespace)].join("\n\n");
+                    source = [renderContentfulImports(), renderNamespace(typingsSource, namespace)].join("\n\n");
                     return [4 /*yield*/, prettier.resolveConfig(process.cwd())];
                 case 1:
-                    prettierConfig = _a.sent();
+                    prettierConfig = _d.sent();
                     return [2 /*return*/, prettier.format(source, __assign({}, prettierConfig, { parser: "typescript" }))];
             }
         });
     });
 }
-function renderAllContentTypes(contentTypes) {
-    return contentTypes.map(function (contentType) { return renderContentType(contentType); }).join("\n\n");
+function renderAllContentTypes(contentTypes, localization) {
+    return contentTypes.map(function (contentType) { return renderContentType(contentType, localization); }).join("\n\n");
 }
 function renderAllContentTypeIds(contentTypes) {
     return renderUnion("CONTENT_TYPE", contentTypes.map(function (contentType) { return "'" + contentType.sys.id + "'"; }));
-}
-function wrapInNamespace(source, namespace) {
-    if (!namespace)
-        return source;
-    return "\n    declare namespace " + namespace + " {\n    " + source + "\n    }\n\n    export as namespace " + namespace + "\n    export=" + namespace + "\n  ";
 }
 
 function renderLink$1(field) {
@@ -336,13 +339,21 @@ function renderContentTypeFields$1(fields) {
         .join("\n\n");
 }
 
-function renderFieldsOnly(contentTypes) {
+function renderFieldsOnly(contentTypes, _a) {
+    var namespace = (_a === void 0 ? {} : _a).namespace;
     return __awaiter(this, void 0, void 0, function () {
-        var sortedContentTypes, source;
-        return __generator(this, function (_a) {
-            sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
-            source = renderAllContentTypes$1(sortedContentTypes);
-            return [2 /*return*/, prettier.format(source, { parser: "typescript" })];
+        var sortedContentTypes, typingsSource, source, prettierConfig;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
+                    typingsSource = renderAllContentTypes$1(sortedContentTypes);
+                    source = [renderNamespace(typingsSource, namespace)].join("\n\n");
+                    return [4 /*yield*/, prettier.resolveConfig(process.cwd())];
+                case 1:
+                    prettierConfig = _b.sent();
+                    return [2 /*return*/, prettier.format(source, __assign({}, prettierConfig, { parser: "typescript" }))];
+            }
         });
     });
 }
@@ -351,7 +362,7 @@ function renderAllContentTypes$1(contentTypes) {
 }
 
 var meow = require("meow");
-var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <options>\n\n  Options\n    --output,      -o  Where to write to\n    --poll,        -p  Continuously refresh types\n    --interval N,  -i  The interval in seconds at which to poll (defaults to 15)\n    --namespace N, -n  Wrap types in namespace N (disabled by default)\n    --fields-only      Output a tree that _only_ ensures fields are valid\n                       and present, and does not provide types for Sys,\n                       Assets, or Rich Text. This is useful for ensuring raw\n                       Contentful responses will be compatible with your code.\n\n  Examples\n    $ contentful-typescript-codegen -o src/@types/generated/contentful.d.ts\n", {
+var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <options>\n\n  Options\n    --output,      -o  Where to write to\n    --poll,        -p  Continuously refresh types\n    --interval N,  -i  The interval in seconds at which to poll (defaults to 15)\n    --namespace N, -n  Wrap types in namespace N (disabled by default)\n    --fields-only      Output a tree that _only_ ensures fields are valid\n                       and present, and does not provide types for Sys,\n                       Assets, or Rich Text. This is useful for ensuring raw\n                       Contentful responses will be compatible with your code.\n    --localization -l  Output fields with localized values\n\n  Examples\n    $ contentful-typescript-codegen -o src/@types/generated/contentful.d.ts\n", {
     flags: {
         output: {
             type: "string",
@@ -370,6 +381,11 @@ var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <
         interval: {
             type: "string",
             alias: "i",
+            required: false,
+        },
+        localization: {
+            type: "boolean",
+            alias: "l",
             required: false,
         },
         namespace: {
@@ -398,7 +414,7 @@ function runCodegen(outputFile) {
                     locales = _a.sent();
                     outputPath = path.resolve(process.cwd(), outputFile);
                     if (!cli.flags.fieldsOnly) return [3 /*break*/, 5];
-                    return [4 /*yield*/, renderFieldsOnly(contentTypes.items)];
+                    return [4 /*yield*/, renderFieldsOnly(contentTypes.items, cli.flags.namespace)];
                 case 4:
                     output = _a.sent();
                     return [3 /*break*/, 7];
