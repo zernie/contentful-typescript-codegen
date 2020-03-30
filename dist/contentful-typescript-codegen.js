@@ -102,7 +102,7 @@ function descriptionComment(description) {
 
 function renderField(field, type, localization) {
     if (localization === void 0) { localization = false; }
-    return renderInterfaceProperty(field.id, type, field.required, field.localized && localization, field.name);
+    return renderInterfaceProperty(field.id, type, field.required, localization, field.name);
 }
 
 function renderContentTypeId(contentTypeId) {
