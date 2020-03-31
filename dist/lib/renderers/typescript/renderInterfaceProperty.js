@@ -6,7 +6,7 @@ function renderInterfaceProperty(name, type, required, localization, description
         name,
         required ? "" : "?",
         ": ",
-        localization ? "Record<LOCALE_CODE, " + type + ">" : type,
+        localization ? "LocalizedField<" + type + ">" : type,
         required ? "" : " | undefined",
         ";",
     ].join("");

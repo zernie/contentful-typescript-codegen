@@ -53,6 +53,7 @@ var renderUnion_1 = require("./typescript/renderUnion");
 var renderAllLocales_1 = require("./contentful/renderAllLocales");
 var renderDefaultLocale_1 = require("./contentful/renderDefaultLocale");
 var renderNamespace_1 = require("./contentful/renderNamespace");
+var renderLocalizedTypes_1 = require("./contentful/renderLocalizedTypes");
 function render(contentTypes, locales, _a) {
     var _b = _a === void 0 ? {} : _a, namespace = _b.namespace, _c = _b.localization, localization = _c === void 0 ? false : _c;
     return __awaiter(this, void 0, void 0, function () {
@@ -67,6 +68,7 @@ function render(contentTypes, locales, _a) {
                         renderAllContentTypeIds(sortedContentTypes),
                         renderAllLocales_1.default(sortedLocales),
                         renderDefaultLocale_1.default(sortedLocales),
+                        renderLocalizedTypes_1.default(localization),
                     ].join("\n\n");
                     source = [renderContentfulImports_1.default(), renderNamespace_1.default(typingsSource, namespace)].join("\n\n");
                     return [4 /*yield*/, prettier_1.resolveConfig(process.cwd())];
