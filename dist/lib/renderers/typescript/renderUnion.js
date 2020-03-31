@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function renderUnion(name, values) {
-    return "\n    type " + name + " = " + renderUnionValues(values) + ";\n  ";
+    return "\n    export type " + name + " = " + renderUnionValues(values) + ";\n  ";
 }
 exports.default = renderUnion;
 function renderUnionValues(values) {

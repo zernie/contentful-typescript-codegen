@@ -5,7 +5,7 @@ function renderDefaultLocale(locales) {
     if (!defaultLocale) {
         throw new Error("Could not find a default locale in Contentful.");
     }
-    return "type CONTENTFUL_DEFAULT_LOCALE_CODE = '" + defaultLocale.code + "';";
+    return "export type CONTENTFUL_DEFAULT_LOCALE_CODE = '" + defaultLocale.code + "';";
 }
 exports.default = renderDefaultLocale;
 //# sourceMappingURL=renderDefaultLocale.js.map

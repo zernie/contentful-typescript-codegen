@@ -1,1 +1,1 @@
-export default function renderContentfulImports(): string;
+export default function renderContentfulImports(localization?: boolean): string;
