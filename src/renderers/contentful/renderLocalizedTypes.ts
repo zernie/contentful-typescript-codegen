@@ -9,9 +9,9 @@ export default function renderLocalizedTypes(localization: boolean) {
     export interface Asset {
       sys: Sys
       fields: {
-        title: string
-        description: string
-        file: {
+        title: LocalizedField<string>
+        description: LocalizedField<string>
+        file: LocalizedField<{
           url: string
           details: {
             size: number
@@ -22,7 +22,7 @@ export default function renderLocalizedTypes(localization: boolean) {
           }
           fileName: string
           contentType: string
-        }
+        }>
       }
       toPlainObject(): object
     }
