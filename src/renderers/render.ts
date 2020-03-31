@@ -8,6 +8,7 @@ import renderUnion from "./typescript/renderUnion"
 import renderAllLocales from "./contentful/renderAllLocales"
 import renderDefaultLocale from "./contentful/renderDefaultLocale"
 import renderNamespace from "./contentful/renderNamespace"
+import renderLocalizedTypes from "./contentful/renderLocalizedTypes"
 
 interface Options {
   namespace?: string
@@ -27,6 +28,7 @@ export default async function render(
     renderAllContentTypeIds(sortedContentTypes),
     renderAllLocales(sortedLocales),
     renderDefaultLocale(sortedLocales),
+    renderLocalizedTypes(localization),
   ].join("\n\n")
 
   const source = [renderContentfulImports(), renderNamespace(typingsSource, namespace)].join("\n\n")
