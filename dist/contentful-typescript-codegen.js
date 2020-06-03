@@ -84,16 +84,19 @@ function renderInterface(_a) {
     return "\n    " + (description ? "/** " + description + " */" : "") + "\n    export interface " + name + " " + (extension ? "extends " + extension : "") + " {\n      " + fields + "\n    }\n  ";
 }
 
-function renderInterfaceProperty(name, type, required, localization, description) {
+function renderInterfaceProperty(name, type, required, localization, localized, description) {
     return [
         descriptionComment(description),
         name,
         required ? "" : "?",
         ": ",
-        localization ? "LocalizedField<" + type + ">" : type,
+        localization ? renderLocalizedField(localized, type) : type,
         required ? "" : " | undefined",
         ";",
     ].join("");
+}
+function renderLocalizedField(localized, type) {
+    return localized ? "LocalizedField<" + type + ">" : "DefaultLocalizedField<" + type + ">";
 }
 function descriptionComment(description) {
     if (description) {
@@ -106,7 +109,7 @@ function descriptionComment(description) {
 
 function renderField(field, type, localization) {
     if (localization === void 0) { localization = false; }
-    return renderInterfaceProperty(field.id, type, field.required, field.localized && localization, field.name);
+    return renderInterfaceProperty(field.id, type, field.required, localization, field.localized, field.name);
 }
 
 function renderContentTypeId(contentTypeId) {
@@ -250,7 +253,7 @@ function renderNamespace(source, namespace) {
 function renderLocalizedTypes(localization) {
     if (!localization)
         return null;
-    return "\n    export type LocalizedField<T> = Partial<Record<LOCALE_CODE, T>>\n  \n    // We have to use our own localized version of Asset because of a bug in contentful https://github.com/contentful/contentful.js/issues/208\n    export interface Asset {\n      sys: Sys\n      fields: {\n        title: LocalizedField<string>\n        description: LocalizedField<string>\n        file: LocalizedField<{\n          url: string\n          details: {\n            size: number\n            image?: {\n              width: number\n              height: number\n            }\n          }\n          fileName: string\n          contentType: string\n        }>\n      }\n      toPlainObject(): object\n    }\n  ";
+    return "\n    export type DefaultLocalizedField<T> = Record<CONTENTFUL_DEFAULT_LOCALE_CODE, T>\n    export type LocalizedField<T> = DefaultLocalizedField<T> & Partial<Record<LOCALE_CODE, T>>\n  \n    // We have to use our own localized version of Asset because of a bug in contentful https://github.com/contentful/contentful.js/issues/208\n    export interface Asset {\n      sys: Sys\n      fields: {\n        title: LocalizedField<string>\n        description: LocalizedField<string>\n        file: LocalizedField<{\n          url: string\n          details: {\n            size: number\n            image?: {\n              width: number\n              height: number\n            }\n          }\n          fileName: string\n          contentType: string\n        }>\n      }\n      toPlainObject(): object\n    }\n  ";
 }
 
 function render(contentTypes, locales, _a) {
