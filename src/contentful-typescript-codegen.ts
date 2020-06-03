@@ -45,14 +45,14 @@ const cli = meow(
         alias: "i",
         required: false,
       },
-      localization: {
-        type: "boolean",
-        alias: "l",
-        required: false,
-      },
       namespace: {
         type: "string",
         alias: "n",
+        required: false,
+      },
+      localization: {
+        type: "boolean",
+        alias: "l",
         required: false,
       },
     },
@@ -73,7 +73,7 @@ async function runCodegen(outputFile: string) {
   } else {
     output = await render(contentTypes.items, locales.items, {
       localization: cli.flags.localization,
-      namespace: cli.flags.namespace
+      namespace: cli.flags.namespace,
     })
   }
 

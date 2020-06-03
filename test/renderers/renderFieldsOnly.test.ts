@@ -36,13 +36,31 @@ describe("renderFieldsOnly()", () => {
 
   it("renders a given content type", async () => {
     expect(await renderFieldsOnly(contentTypes)).toMatchInlineSnapshot(`
-      "export interface IMyContentType {
-        fields: {
-          /** Array field */
-          arrayField: (\\"one\\" | \\"of\\" | \\"the\\" | \\"above\\")[];
-        };
-        [otherKeys: string]: any;
+            "export interface IMyContentType {
+              fields: {
+                /** Array field */
+                arrayField: (\\"one\\" | \\"of\\" | \\"the\\" | \\"above\\")[]
+              }
+              [otherKeys: string]: any
+            }
+            "
+        `)
+  })
+
+  it("renders a given content type inside a namespace", async () => {
+    expect(await renderFieldsOnly(contentTypes, { namespace: "Codegen" })).toMatchInlineSnapshot(`
+      "declare namespace Codegen {
+        export interface IMyContentType {
+          fields: {
+            /** Array field */
+            arrayField: (\\"one\\" | \\"of\\" | \\"the\\" | \\"above\\")[]
+          }
+          [otherKeys: string]: any
+        }
       }
+
+      export as namespace Codegen
+      export = Codegen
       "
     `)
   })

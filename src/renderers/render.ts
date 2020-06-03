@@ -11,8 +11,8 @@ import renderNamespace from "./contentful/renderNamespace"
 import renderLocalizedTypes from "./contentful/renderLocalizedTypes"
 
 interface Options {
-  namespace?: string
   localization?: boolean
+  namespace?: string
 }
 
 export default async function render(
@@ -31,7 +31,10 @@ export default async function render(
     renderLocalizedTypes(localization),
   ].join("\n\n")
 
-  const source = [renderContentfulImports(), renderNamespace(typingsSource, namespace)].join("\n\n")
+  const source = [
+    renderContentfulImports(localization),
+    renderNamespace(typingsSource, namespace),
+  ].join("\n\n")
 
   const prettierConfig = await resolveConfig(process.cwd())
   return format(source, { ...prettierConfig, parser: "typescript" })
