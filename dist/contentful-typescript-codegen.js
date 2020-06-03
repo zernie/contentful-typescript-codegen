@@ -106,7 +106,7 @@ function descriptionComment(description) {
 
 function renderField(field, type, localization) {
     if (localization === void 0) { localization = false; }
-    return renderInterfaceProperty(field.id, type, field.required, localization, field.name);
+    return renderInterfaceProperty(field.id, type, field.required, field.localized && localization, field.name);
 }
 
 function renderContentTypeId(contentTypeId) {
@@ -159,7 +159,7 @@ function renderArray(field) {
     if (!field.items) {
         throw new Error("Cannot render non-array field " + field.id + " as an array");
     }
-    var fieldWithValidations = __assign({}, field, { linkType: field.items.linkType, validations: field.items.validations || [] });
+    var fieldWithValidations = __assign(__assign({}, field), { linkType: field.items.linkType, validations: field.items.validations || [] });
     switch (field.items.type) {
         case "Symbol": {
             return renderArrayOf(renderSymbol(fieldWithValidations));
@@ -269,11 +269,14 @@ function render(contentTypes, locales, _a) {
                         renderDefaultLocale(sortedLocales),
                         renderLocalizedTypes(localization),
                     ].join("\n\n");
-                    source = [renderContentfulImports(), renderNamespace(typingsSource, namespace)].join("\n\n");
+                    source = [
+                        renderContentfulImports(localization),
+                        renderNamespace(typingsSource, namespace),
+                    ].join("\n\n");
                     return [4 /*yield*/, prettier.resolveConfig(process.cwd())];
                 case 1:
                     prettierConfig = _d.sent();
-                    return [2 /*return*/, prettier.format(source, __assign({}, prettierConfig, { parser: "typescript" }))];
+                    return [2 /*return*/, prettier.format(source, __assign(__assign({}, prettierConfig), { parser: "typescript" }))];
             }
         });
     });
@@ -305,7 +308,7 @@ function renderArray$1(field) {
     if (!field.items) {
         throw new Error("Cannot render non-array field " + field.id + " as an array");
     }
-    var fieldWithValidations = __assign({}, field, { linkType: field.items.linkType, validations: field.items.validations || [] });
+    var fieldWithValidations = __assign(__assign({}, field), { linkType: field.items.linkType, validations: field.items.validations || [] });
     switch (field.items.type) {
         case "Symbol": {
             return renderArrayOf(renderSymbol(fieldWithValidations));
@@ -354,12 +357,18 @@ function renderContentTypeFields$1(fields) {
 function renderFieldsOnly(contentTypes, _a) {
     var namespace = (_a === void 0 ? {} : _a).namespace;
     return __awaiter(this, void 0, void 0, function () {
-        var sortedContentTypes, typingsSource, source;
+        var sortedContentTypes, typingsSource, source, prettierConfig;
         return __generator(this, function (_b) {
-            sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
-            typingsSource = renderAllContentTypes$1(sortedContentTypes);
-            source = [renderNamespace(typingsSource, namespace)].join("\n\n");
-            return [2 /*return*/, prettier.format(source, { parser: "typescript" })];
+            switch (_b.label) {
+                case 0:
+                    sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
+                    typingsSource = renderAllContentTypes$1(sortedContentTypes);
+                    source = [renderNamespace(typingsSource, namespace)].join("\n\n");
+                    return [4 /*yield*/, prettier.resolveConfig(process.cwd())];
+                case 1:
+                    prettierConfig = _b.sent();
+                    return [2 /*return*/, prettier.format(source, __assign(__assign({}, prettierConfig), { parser: "typescript" }))];
+            }
         });
     });
 }
@@ -389,14 +398,14 @@ var cli = meow("\n  Usage\n    $ contentful-typescript-codegen --output <file> <
             alias: "i",
             required: false,
         },
-        localization: {
-            type: "boolean",
-            alias: "l",
-            required: false,
-        },
         namespace: {
             type: "string",
             alias: "n",
+            required: false,
+        },
+        localization: {
+            type: "boolean",
+            alias: "l",
             required: false,
         },
     },
@@ -426,7 +435,7 @@ function runCodegen(outputFile) {
                     return [3 /*break*/, 7];
                 case 5: return [4 /*yield*/, render(contentTypes.items, locales.items, {
                         localization: cli.flags.localization,
-                        namespace: cli.flags.namespace
+                        namespace: cli.flags.namespace,
                     })];
                 case 6:
                     output = _a.sent();

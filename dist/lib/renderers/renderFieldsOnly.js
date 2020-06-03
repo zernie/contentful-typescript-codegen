@@ -1,9 +1,21 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -41,12 +53,18 @@ var renderNamespace_1 = require("./contentful/renderNamespace");
 function renderFieldsOnly(contentTypes, _a) {
     var namespace = (_a === void 0 ? {} : _a).namespace;
     return __awaiter(this, void 0, void 0, function () {
-        var sortedContentTypes, typingsSource, source;
+        var sortedContentTypes, typingsSource, source, prettierConfig;
         return __generator(this, function (_b) {
-            sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
-            typingsSource = renderAllContentTypes(sortedContentTypes);
-            source = [renderNamespace_1.default(typingsSource, namespace)].join("\n\n");
-            return [2 /*return*/, prettier_1.format(source, { parser: "typescript" })];
+            switch (_b.label) {
+                case 0:
+                    sortedContentTypes = contentTypes.sort(function (a, b) { return a.sys.id.localeCompare(b.sys.id); });
+                    typingsSource = renderAllContentTypes(sortedContentTypes);
+                    source = [renderNamespace_1.default(typingsSource, namespace)].join("\n\n");
+                    return [4 /*yield*/, prettier_1.resolveConfig(process.cwd())];
+                case 1:
+                    prettierConfig = _b.sent();
+                    return [2 /*return*/, prettier_1.format(source, __assign(__assign({}, prettierConfig), { parser: "typescript" }))];
+            }
         });
     });
 }

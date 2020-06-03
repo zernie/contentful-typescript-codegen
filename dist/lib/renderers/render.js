@@ -11,10 +11,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -70,11 +71,14 @@ function render(contentTypes, locales, _a) {
                         renderDefaultLocale_1.default(sortedLocales),
                         renderLocalizedTypes_1.default(localization),
                     ].join("\n\n");
-                    source = [renderContentfulImports_1.default(), renderNamespace_1.default(typingsSource, namespace)].join("\n\n");
+                    source = [
+                        renderContentfulImports_1.default(localization),
+                        renderNamespace_1.default(typingsSource, namespace),
+                    ].join("\n\n");
                     return [4 /*yield*/, prettier_1.resolveConfig(process.cwd())];
                 case 1:
                     prettierConfig = _d.sent();
-                    return [2 /*return*/, prettier_1.format(source, __assign({}, prettierConfig, { parser: "typescript" }))];
+                    return [2 /*return*/, prettier_1.format(source, __assign(__assign({}, prettierConfig), { parser: "typescript" }))];
             }
         });
     });
