@@ -125,13 +125,13 @@ describe("renderContentType()", () => {
     expect(format(renderContentType(contentType, true))).toMatchInlineSnapshot(`
       "export interface IMyContentTypeFields {
         /** Symbol Field™ */
-        symbolField?: string | undefined;
+        symbolField?: DefaultLocalizedField<string> | undefined;
 
         /** Localized Symbol Field™ */
         localizedSymbolField: LocalizedField<string>;
 
         /** Array field */
-        arrayField: (\\"one\\" | \\"of\\" | \\"the\\" | \\"above\\")[];
+        arrayField: DefaultLocalizedField<(\\"one\\" | \\"of\\" | \\"the\\" | \\"above\\")[]>;
       }
 
       export interface IMyContentType extends Entry<IMyContentTypeFields> {

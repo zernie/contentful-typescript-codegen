@@ -10,7 +10,8 @@ export default function renderField(
     field.id,
     type,
     field.required,
-    field.localized && localization,
+    localization,
+    field.localized,
     field.name,
   )
 }
